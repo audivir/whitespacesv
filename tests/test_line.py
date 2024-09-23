@@ -1,16 +1,14 @@
 """Tests for the WsvLine class."""
+
+from __future__ import annotations
+
 import pytest
 
 from whitespacesv.line import WsvLine
 
 
 @pytest.mark.parametrize(
-    "whitespaces, expected",
-    [
-        ([" ", None], False),
-        (None, False),
-        (["te"], True),
-    ],
+    "whitespaces, expected", [([" ", None], False), (None, False), (["te"], True)]
 )
 def test_validate_whitespaces(
     whitespaces: list[str | None] | None, expected: bool
@@ -26,13 +24,7 @@ def test_validate_whitespaces(
 
 
 @pytest.mark.parametrize(
-    "comment, expected",
-    [
-        ("", False),
-        ("test", False),
-        (" ", False),
-        ("\n", True),
-    ],
+    "comment, expected", [("", False), ("test", False), (" ", False), ("\n", True)]
 )
 def test_validate_comment(comment: str | None, expected: bool) -> None:
     if expected:

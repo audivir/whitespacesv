@@ -1,11 +1,13 @@
-# %%
 """Tests for whitespacesv.utils module."""
+
+from __future__ import annotations
+
 import pandas as pd
 import pytest
 
 from whitespacesv.utils import (
     WsvCharIterator,
-    WsvParserException,
+    WsvParserError,
     contains_string_special_chars,
     is_ord_whitespace,
     is_string_whitespace,
@@ -14,14 +16,14 @@ from whitespacesv.utils import (
 
 
 def test_reinfer_types() -> None:
-    df = pd.DataFrame({"a": ["1", "2", "3"], "b": ["4", "5", "6"]})
-    df = reinfer_types(df)  # pylint: disable=redefined-variable-type
-    assert df.dtypes["a"] == "int64"
-    assert df.dtypes["b"] == "int64"
+    raw_df = pd.DataFrame({"a": ["1", "2", "3"], "b": ["4", "5", "6"]})
+    infered_df = reinfer_types(raw_df)
+    assert infered_df.dtypes["a"] == "int64"
+    assert infered_df.dtypes["b"] == "int64"
 
 
 # test for is_ord_whitespace
-WHITESPACES = [
+WHITESPACES = {
     0x0009,
     0x000B,
     0x000C,
@@ -46,7 +48,7 @@ WHITESPACES = [
     0x202F,
     0x205F,
     0x3000,
-]
+}
 
 
 def test_is_ord_whitespace() -> None:
@@ -81,19 +83,14 @@ def test_contains_string_special_chars() -> None:
 
 
 def test_wsv_parser_exception() -> None:
-    exc = WsvParserException(0, 0, 0, "test")
-    with pytest.raises(WsvParserException, match=r"test \(1, 1\)"):
+    exc = WsvParserError(0, 0, 0, "test")
+    with pytest.raises(WsvParserError, match=r"test \(1, 1\)"):
         raise exc
     assert str(exc) == "test (1, 1)"
 
 
 @pytest.mark.parametrize(
-    "c, eof, ws",
-    [
-        ("a", False, False),
-        ("", True, False),
-        (" ", False, True),
-    ],
+    "c, eof, ws", [("a", False, False), ("", True, False), (" ", False, True)]
 )
 def test_is_whitespace(c: str, eof: bool, ws: bool) -> None:
     it = WsvCharIterator(c)
@@ -145,19 +142,12 @@ def test_get_exc() -> None:
     assert exc.ix == 1
     assert exc.line_ix == 0
     assert exc.line_position == 1
-    with pytest.raises(WsvParserException, match=r"test \(1, 2\)"):
+    with pytest.raises(WsvParserError, match=r"test \(1, 2\)"):
         raise exc
 
 
 @pytest.mark.parametrize(
-    "text, expected",
-    [
-        ("a", False),
-        ("#", True),
-        ("", True),
-        (" ", True),
-        ("\n", True),
-    ],
+    "text, expected", [("a", False), ("#", True), ("", True), (" ", True), ("\n", True)]
 )
 def test_stop_read(text: str, expected: bool) -> None:
     it = WsvCharIterator(text)
@@ -165,13 +155,7 @@ def test_stop_read(text: str, expected: bool) -> None:
 
 
 @pytest.mark.parametrize(
-    "text, expected",
-    [
-        ("a", False),
-        (" ", False),
-        ("\n", True),
-        ("", True),
-    ],
+    "text, expected", [("a", False), (" ", False), ("\n", True), ("", True)]
 )
 def test_is_end_of_section(text: str, expected: bool) -> None:
     it = WsvCharIterator(text)
@@ -197,7 +181,7 @@ def test_read_string(text: str, expected: str | None, message: str | None) -> No
         assert it.read_string() == expected
 
     if message:
-        with pytest.raises(WsvParserException, match=message):
+        with pytest.raises(WsvParserError, match=message):
             it.read_string()
 
 
@@ -219,7 +203,7 @@ def test_read_value(text: str, expected: str | None, message: str | None) -> Non
         assert it.read_value() == expected
 
     if message:
-        with pytest.raises(WsvParserException, match=message):
+        with pytest.raises(WsvParserError, match=message):
             it.read_value()
 
 

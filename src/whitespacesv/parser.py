@@ -1,10 +1,13 @@
-"""This module contains the WsvParser class"""
+"""This module contains the WsvParser class."""
+
+from __future__ import annotations
+
 from whitespacesv.line import WsvLine
 from whitespacesv.utils import WsvCharIterator
 
 
 def check_for_end(iterator: WsvCharIterator) -> None:
-    """Checks if the iterator is at the end of the section"""
+    """Checks if the iterator is at the end of the section."""
     if iterator.is_eof():
         return
 
@@ -19,7 +22,7 @@ def _parse_value_wrapper(iterator: WsvCharIterator) -> str | None:
         return iterator.read_string()
 
     value = iterator.read_value()
-    if value == "-":  # pylint: disable=consider-using-assignment-expr
+    if value == "-":
         return None
 
     return value
@@ -28,10 +31,10 @@ def _parse_value_wrapper(iterator: WsvCharIterator) -> str | None:
 def _try_parse_comment(
     iterator: WsvCharIterator, whitespace: str | None, whitespaces: list[str | None]
 ) -> str | None:
-    """Parses the comment text"""
+    """Parses the comment text."""
     if not iterator.try_read_char(0x23):  # HASH
         return None
-    
+
     comment = iterator.read_comment_text()
     if whitespace is None:
         whitespaces.append(None)
@@ -40,8 +43,7 @@ def _try_parse_comment(
 
 
 def _parse_line(iterator: WsvCharIterator) -> WsvLine:
-    """Parses a WSV line"""
-
+    """Parses a WSV line."""
     values: list[str | None] = []
     whitespaces: list[str | None] = []
 
@@ -65,18 +67,16 @@ def _parse_line(iterator: WsvCharIterator) -> WsvLine:
 
         whitespace = iterator.read_whitespace_or_null()
 
-        if whitespace is None:  # pylint: disable=consider-using-assignment-expr
+        if whitespace is None:
             break
 
         whitespaces.append(whitespace)
 
-    new_line = WsvLine(values, whitespaces, comment)
-
-    return new_line
+    return WsvLine(values, whitespaces, comment)
 
 
 def parse_lines(text: str) -> list[WsvLine]:
-    """Parses the WSV lines"""
+    """Parses the WSV lines."""
     lines: list[WsvLine] = []
 
     iterator = WsvCharIterator(text)

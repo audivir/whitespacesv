@@ -1,4 +1,7 @@
 """Tests for the whitespacesv.serializer module."""
+
+from __future__ import annotations
+
 import pytest
 
 from whitespacesv.line import WsvLine

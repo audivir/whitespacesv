@@ -1,31 +1,26 @@
 """The document module of the whitespacesv package."""
+
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import pandas as pd
 from typing_extensions import Self, override
 
 from whitespacesv.line import WsvLine
 from whitespacesv.parser import parse_lines
-from whitespacesv.serializer import (
-    SerializationMode,
-    prettify_values,
-    serialize_line,
-    serialize_value,
-)
+from whitespacesv.serializer import prettify_values, serialize_line, serialize_value
 from whitespacesv.txt import StrPath, TxtDocument
 from whitespacesv.utils import reinfer_types
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 class WsvDocument:
     """A class representing a WSV document."""
 
-    def __init__(
-        self,
-        lines: Sequence[WsvLine] | None = None,
-    ):
+    def __init__(self, lines: Sequence[WsvLine] | None = None) -> None:
         """Initializes the WSV document.
 
         Args:
@@ -57,42 +52,41 @@ class WsvDocument:
         Returns:
             The parsed WsvDocument
         """
-
         lines = parse_lines(text)
         return cls(lines)
 
-    def serialize(self, mode: SerializationMode | str = "preserve") -> list[str]:
+    def serialize(
+        self, mode: Literal["preserve", "compact", "pretty"] = "preserve"
+    ) -> list[str]:
         """Serializes the lines.
 
         Args:
-            mode:
-                The serialization mode,
-                for more information see :class:`SerializationMode`
+            mode: If mode is `preserve`, the values are serialized
+                with the original whitespaces and comments.
+                If mode is `compact`, the values are serialized
+                without whitespaces and comments.
+                If mode is `pretty`, the values are serialized with
+                a minimum of whitespaces and the original comments.
 
         Returns:
             A list of serialized lines
         """
-        if isinstance(mode, str):
-            mode = SerializationMode(mode)
-
         values = [
-            [serialize_value(value) for value in line.values] for line in self.lines
+            [serialize_value(value) for value in line.values]  # noqa: PD011
+            for line in self.lines
         ]
 
-        SM = SerializationMode
-
-        if mode == SM.COMPACT or mode == SM.PRETTY:  # pylint: disable=consider-using-in
-            if mode == SM.COMPACT:
-                serialized = [" ".join(x) for x in values]
-            else:
-                serialized = prettify_values(
-                    values, [line.comment for line in self.lines]
-                )
-        else:
+        if mode == "compact":
+            serialized = [" ".join(x) for x in values]
+        elif mode == "pretty":
+            serialized = prettify_values(values, [line.comment for line in self.lines])
+        elif mode == "preserve":
             serialized = [
                 serialize_line(line_values, line.whitespaces, line.comment)
-                for line_values, line in zip(values, self.lines)
+                for line_values, line in zip(values, self.lines, strict=False)
             ]
+        else:
+            raise ValueError(f"'{mode}' is not a valid serialization mode")
 
         return serialized
 
@@ -111,8 +105,7 @@ class WsvDocument:
         text = file.text
         if not text or not text[-1] == "\n":
             raise ValueError("Empty file or no new line at the end")
-        doc = cls.parse(file.text)
-        return doc
+        return cls.parse(file.text)
 
     def to_string(
         self, mode: Literal["preserve", "compact", "pretty"] = "preserve"
@@ -134,7 +127,7 @@ class WsvDocument:
         file_path: StrPath,
         mode: Literal["preserve", "compact", "pretty"] = "preserve",
     ) -> None:
-        """Saves the document to a file with a new line appended
+        """Saves the document to a file with a new line appended.
 
         Args:
             file_path:
@@ -150,7 +143,7 @@ class WsvDocument:
         file.save(file_path)
 
     def to_pandas(self, header: bool = True, infer_types: bool = True) -> pd.DataFrame:
-        """Converts the document to a pandas DataFrame
+        """Converts the document to a pandas DataFrame.
 
         Args:
             header:
@@ -160,32 +153,32 @@ class WsvDocument:
                 For more information see :func:`reinfer_types`
         """
         # skip empty rows
-        values = [x.values for x in self.lines if x.values]
+        values = [x.values for x in self.lines if x.values]  # noqa: PD011
 
         if header:
             columns, values = values[0], values[1:]
         else:
             columns = None
 
-        df = pd.DataFrame(values, columns=columns)
+        output_df = pd.DataFrame(values, columns=columns)
 
         if infer_types:
-            return reinfer_types(df)
+            return reinfer_types(output_df)
 
-        return df
+        return output_df
 
     @classmethod
-    def from_pandas(cls, df: pd.DataFrame, header: bool = True) -> Self:
-        """Converts the DataFrame to the document
+    def from_pandas(cls, input_df: pd.DataFrame, header: bool = True) -> Self:
+        """Converts the DataFrame to the document.
 
         If header is True, the column names are added as the first row.
         """
         # all except nan or None to string
-        df = df.copy()
+        input_df = input_df.copy()
 
-        values = list(df.itertuples(index=False, name=None))
+        values = list(input_df.itertuples(index=False, name=None))
         values = [[str(x) if pd.notna(x) else None for x in row] for row in values]
         if header:
-            values.insert(0, list(df.columns))
+            values.insert(0, list(input_df.columns))
         lines = [WsvLine(x) for x in values]
         return cls(lines)

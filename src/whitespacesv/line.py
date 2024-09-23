@@ -1,22 +1,39 @@
 """This module contains the WsvLine class."""
+
 from __future__ import annotations
 
-from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from typing_extensions import override
 
 from whitespacesv.utils import is_string_whitespace
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
 
 class WsvLine:
-    """The WsvLine class represents a line in a WSV document"""
+    """The WsvLine class represents a line in a WSV document."""
 
     def __init__(
         self,
         values: Sequence[str | None] | None = None,
         whitespaces: Sequence[str | None] | None = None,
         comment: str | None = None,
-    ):
+    ) -> None:
+        """Initializes the WsvLine.
+
+        Args:
+            values:
+                The values of the line.
+                If no values are provided, an empty line is created.
+            whitespaces:
+                The whitespaces of the line.
+                If no whitespaces are provided, no whitespaces are present.
+            comment:
+                The comment of the line.
+                If no comment is provided, no comment is present.
+        """
         self.values = list(values) if values is not None else []
 
         WsvLine.validate_whitespaces(whitespaces)
@@ -35,22 +52,24 @@ class WsvLine:
             return False
 
         return (
-            self.values == value.values
+            self.values == value.values  # noqa: PD011
             and self.whitespaces == value.whitespaces
             and self.comment == value.comment
         )
 
     @property
     def whitespaces(self) -> list[str | None] | None:
+        """The whitespaces of the line."""
         return self._whitespaces
 
     @property
     def comment(self) -> str | None:
+        """The comment of the line."""
         return self._comment
 
     @staticmethod
     def validate_whitespaces(whitespaces: Sequence[str | None] | None) -> None:
-        """Validates the whitespaces: no non-whitespace character allowed"""
+        """Validates the whitespaces: no non-whitespace character allowed."""
         if whitespaces is not None:
             for whitespace in whitespaces:
                 if not whitespace:
@@ -63,7 +82,7 @@ class WsvLine:
 
     @staticmethod
     def validate_comment(comment: str | None) -> None:
-        """Validates the comment: no line feed allowed"""
+        """Validates the comment: no line feed allowed."""
         if not comment:
             return
 

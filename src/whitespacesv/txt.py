@@ -1,4 +1,5 @@
 """Base class for a TxtDocument and a TxtCharIterator."""
+
 from __future__ import annotations
 
 from os import PathLike
@@ -7,14 +8,11 @@ from typing import TypeAlias
 
 from typing_extensions import Self
 
-# NEW_LINE = 0x0A
-# NEW_LINE_CHAR = "\n"
-
 StrPath: TypeAlias = str | PathLike[str] | Path
 
 
 def chars_to_ords(chars: str) -> list[int]:
-    """Convert a string to a list of code points
+    """Convert a string to a list of code points.
 
     Args:
         chars (str): The string to convert
@@ -26,7 +24,7 @@ def chars_to_ords(chars: str) -> list[int]:
 
 
 def ords_to_chars(ords: list[int]) -> str:
-    """Convert a list of code points to a string
+    """Convert a list of code points to a string.
 
     Args:
         ords (list[int]): The list of code points to convert
@@ -40,7 +38,7 @@ def ords_to_chars(ords: list[int]) -> str:
 class TxtDocument:
     """A class representing a text document."""
 
-    def __init__(self, text: str = ""):
+    def __init__(self, text: str = "") -> None:
         """Initializes the document with a text."""
         self._text = text
 
@@ -50,8 +48,8 @@ class TxtDocument:
         return self._text
 
     def save(self, file_path: StrPath) -> None:
-        """Writes the text with '\\n' line endings to a file."""
-        with open(file_path, "w", newline="\n", encoding="utf-8") as file:
+        r"""Writes the text with '\\n' line endings to a file."""
+        with Path(file_path).open("w", newline="\n", encoding="utf-8") as file:
             file.write(self._text)
 
     @classmethod
@@ -63,9 +61,8 @@ class TxtDocument:
         text = Path(file_path).read_text(encoding="utf-8")
 
         # Allow for utf-8 BOM but ignore it
-        if text and text[0]:
-            if text[0] == "\ufeff":
-                text = text[1:]
+        if text and text[0] and text[0] == "\ufeff":
+            text = text[1:]
 
         return cls(text)
 
@@ -73,7 +70,7 @@ class TxtDocument:
 class TxtCharIterator:
     """An iterator for a text."""
 
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         """Initializes the iterator with a text."""
         self._chars = chars_to_ords(text)
         self._ix = 0
@@ -97,7 +94,7 @@ class TxtCharIterator:
         line_ix = 0
         line_position = 0
         for i in range(self._ix):
-            if self._chars[i] == 0x0A:  # NEW_LINE
+            if self._chars[i] == 0x0A:  # NEW_LINE # noqa: PLR2004
                 line_ix += 1
                 line_position = 0
             else:
@@ -120,3 +117,8 @@ class TxtCharIterator:
             return False
         self.forward()
         return True
+
+
+# ruff: noqa: ERA001
+# NEW_LINE = 0x0A
+# NEW_LINE_CHAR = "\n"

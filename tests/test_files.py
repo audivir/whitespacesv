@@ -1,11 +1,15 @@
-#%%
+# %%
 """Test reading and writing files."""
+
+from __future__ import annotations
+
 from pathlib import Path
 
 import pandas as pd
 
 from whitespacesv import WsvDocument
 from whitespacesv.line import WsvLine
+
 ASSETS = Path(__file__).parent / "assets"
 
 
@@ -48,20 +52,22 @@ def test_comment_table() -> None:
     csv_df = csv_df.iloc[:-1].astype(int)
     assert wsv_df.equals(csv_df)
 
-def test_space_lines():
-    table = '''"a b" "c d" #comment
-"1 2" 3 
-4 "no comment in this line"
-'''
-    clean = '''"a b" "c d"
+
+def test_space_lines() -> None:
+    table = """"a b" "c d" #comment
 "1 2" 3
 4 "no comment in this line"
-'''
-    pretty = '''"a b"\t"c d"                    \t#comment
-"1 2"\t3                        
+"""
+    clean = """"a b" "c d"
+"1 2" 3
+4 "no comment in this line"
+"""
+    # TODO: fix the useless trailing whitespace
+    pretty = """"a b"\t"c d"                    \t#comment
+"1 2"\t3
 4    \t"no comment in this line"
-'''
-    
+"""
+
     doc = WsvDocument.parse(table)
     print(repr(pretty))
     print(repr(doc.to_string("pretty")))
@@ -70,8 +76,8 @@ def test_space_lines():
     assert doc.to_string("pretty") == pretty
 
 
-def test_to_string():
-    values = ['Region 10', '105', 'random', '3', '1']
+def test_to_string() -> None:
+    values = ["Region 10", "105", "random", "3", "1"]
     line = WsvLine(values, [None, "\t", " ", " ", " "], "test")
     doc = WsvDocument([line])
     comp = doc.to_string("compact")
@@ -80,7 +86,7 @@ def test_to_string():
     assert comp == '"Region 10" 105 random 3 1\n'
     assert pres == '"Region 10"\t105 random 3 1#test\n'
     assert pret == '"Region 10"\t105\trandom\t3\t1\t#test\n'
-    
+
     # reparse
     comp_line = WsvLine(values, [None, " ", " ", " ", " "], None)
     pres_line = line
@@ -90,5 +96,6 @@ def test_to_string():
     print(repr(pret))
     print(repr(WsvDocument.parse(pret).lines))
     assert WsvDocument.parse(pret).lines == [pret_line]
+
 
 # %%
