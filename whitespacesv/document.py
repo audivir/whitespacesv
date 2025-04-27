@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 
-import pandas as pd
 from typing_extensions import Self, override
 
 from whitespacesv.line import WsvLine
@@ -20,6 +19,8 @@ from whitespacesv.utils import reinfer_types
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    import pandas as pd
 
 SM = SerializationMode
 
@@ -63,8 +64,7 @@ class WsvDocument:
         return cls(lines)
 
     def serialize(
-        self,
-        mode: Literal["preserve", "compact", "pretty"] | SerializationMode = "preserve",
+        self, mode: Literal["preserve", "compact", "pretty"] | SerializationMode = "preserve"
     ) -> list[str]:
         """Serializes the lines.
 
@@ -117,9 +117,7 @@ class WsvDocument:
             raise ValueError("Empty file or no new line at the end")
         return cls.parse(file.text)
 
-    def to_string(
-        self, mode: Literal["preserve", "compact", "pretty"] = "preserve"
-    ) -> str:
+    def to_string(self, mode: Literal["preserve", "compact", "pretty"] = "preserve") -> str:
         """Serializes the document to a string.
 
         Args:
@@ -133,9 +131,7 @@ class WsvDocument:
         return "\n".join(self.serialize(mode)) + "\n"
 
     def save(
-        self,
-        file_path: StrPath,
-        mode: Literal["preserve", "compact", "pretty"] = "preserve",
+        self, file_path: StrPath, mode: Literal["preserve", "compact", "pretty"] = "preserve"
     ) -> None:
         """Saves the document to a file with a new line appended.
 
@@ -162,6 +158,8 @@ class WsvDocument:
                 Whether to infer the types of the columns.
                 For more information see `reinfer_types`
         """
+        import pandas as pd
+
         # skip empty rows
         values = [x.values for x in self.lines if x.values]  # noqa: PD011
 
@@ -183,6 +181,8 @@ class WsvDocument:
 
         If header is True, the column names are added as the first row.
         """
+        import pandas as pd
+
         # all except nan or None to string
         input_df = input_df.copy()
 

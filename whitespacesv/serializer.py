@@ -6,11 +6,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from whitespacesv.utils import (
-    chars_to_ords,
-    contains_string_special_chars,
-    ords_to_chars,
-)
+from whitespacesv.utils import chars_to_ords, contains_string_special_chars, ords_to_chars
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -44,9 +40,7 @@ def prettify_values(values: list[list[str]], comments: list[str | None]) -> list
 
     serialized: list[str] = []
     for serialized_values, comment in zip(values, comments, strict=False):
-        expanded_cols = [
-            f"{x:<{col_sizes[ix]}}" for ix, x in enumerate(serialized_values)
-        ]
+        expanded_cols = [f"{x:<{col_sizes[ix]}}" for ix, x in enumerate(serialized_values)]
 
         serialized_line = min_spacing.join(expanded_cols)
 
@@ -108,9 +102,7 @@ def _get_whitespace(whitespaces: list[str | None], ix: int) -> str | None:
     return whitespaces[ix] if ix < len(whitespaces) else None
 
 
-def serialize_values_with_whitespace(
-    values: list[str], whitespaces: list[str | None]
-) -> str:
+def serialize_values_with_whitespace(values: list[str], whitespaces: list[str | None]) -> str:
     """Serializes the values with the whitespaces."""
     if not values:
         return _serialize_whitespace(whitespaces[0], False)

@@ -9,9 +9,7 @@ import pytest
 from whitespacesv.txt import TxtCharIterator, TxtDocument, chars_to_ords, ords_to_chars
 
 
-@pytest.mark.parametrize(
-    ("chars", "expected_result"), [("abc", [97, 98, 99]), ("", [])]
-)
+@pytest.mark.parametrize(("chars", "expected_result"), [("abc", [97, 98, 99]), ("", [])])
 def test_chars_to_ords(chars: str, expected_result: list[int]) -> None:
     assert chars_to_ords(chars) == expected_result
 

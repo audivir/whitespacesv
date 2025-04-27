@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 from io import StringIO
-
-import pandas as pd
+from typing import TYPE_CHECKING
 
 from whitespacesv.txt import TxtCharIterator, chars_to_ords, ords_to_chars
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 def is_ord_whitespace(c: int) -> bool:
@@ -185,6 +187,8 @@ class WsvCharIterator(TxtCharIterator):
 
 def reinfer_types(df: pd.DataFrame) -> pd.DataFrame:
     """Infer the types of the DataFrame from a temporary CSV file."""
+    import pandas as pd
+
     tmp = StringIO()
     df.to_csv(tmp, index=False)
     return pd.read_csv(StringIO(tmp.getvalue()))

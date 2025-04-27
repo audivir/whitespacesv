@@ -72,12 +72,9 @@ PRETTY = """\
 
 
 @pytest.mark.parametrize(
-    ("mode", "expected"),
-    [("preserve", TABLE), ("compact", COMPACT), ("pretty", PRETTY)],
+    ("mode", "expected"), [("preserve", TABLE), ("compact", COMPACT), ("pretty", PRETTY)]
 )
-def test_space_lines(
-    mode: Literal["preserve", "compact", "pretty"], expected: str
-) -> None:
+def test_space_lines(mode: Literal["preserve", "compact", "pretty"], expected: str) -> None:
     doc = WsvDocument.parse(expected)
     assert doc.to_string(mode) == expected
 

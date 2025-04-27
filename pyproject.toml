@@ -1,54 +1,53 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
-
-# pyproject-tools
 
 [project]
 name = "whitespacesv"
-version = "0.0.1"
-dependencies = [
-    "pandas",
-]
-requires-python = ">=3.10, <3.12"
-authors = [
-    {name = "Tim Hörmann"},
-    {email = "pypi@audivir.de"},
-]
+dynamic = ["version"]
+dependencies = ["pandas"]
+requires-python = ">=3.9"
+authors = [{ name = "Tim Hörmann", email = "pypi@audivir.de" }]
 description = "Fork from stenway/WSV-Python"
 readme = "README.md"
+license = "MIT"
 classifiers = [
-    "Development Status :: 1 - Planning",
-    "Private :: Do Not Upload",
-    "Programming Language :: Python :: 3",
+  "Development Status :: 1 - Planning",
+  "Private :: Do Not Upload",
+  "Programming Language :: Python :: 3",
 ]
 
-[project.optional-dependencies]
-dev = ["coverage[toml]", "mypy", "pylint", "pytest"]
-
 [project.urls]
-homepage = "https://www.github.com/tim25651/whitespacesv"
-repository = "https://www.github.com/tim25651/whitespacesv"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["whitespacesv*"]
+[project.optional-dependencies]
+dev = ["ruff", "mypy", "pytest", "coverage[toml]", "vulture"]
 
-# pyproject-tools
+[tool.setuptools]
+dynamic = { version = { attr = "whitespacesv.__version__" } }
 
 [tool.mypy]
-python_version = "3.10"
-enable_error_code = """type-arg,no-untyped-def,redundant-cast,redundant-self,comparison-overlap,
-                    no-untyped-call,no-any-return,no-any-unimported,unreachable,redundant-expr,
-                    possibly-undefined,truthy-bool,truthy-iterable,ignore-without-code,
-                    unused-awaitable,unused-ignore,explicit-override,unimported-reveal"""
+python_version = "3.9"
+strict = true
 disable_error_code = "import-untyped"
+enable_error_code = """type-arg,no-untyped-def,redundant-cast,redundant-self,comparison-overlap,
+                    no-untyped-call,no-any-return,no-any-unimported,unreachable,deprecated,redundant-expr,
+                    possibly-undefined,truthy-bool,truthy-iterable,ignore-without-code,
+                    unused-awaitable,unused-ignore,explicit-override,unimported-reveal,mutable-override,unimported-reveal,explicit-any"""
+
+# untyped definitions and calls
 disallow_untyped_calls = true
 disallow_untyped_defs = true
-warn_unused_ignores = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+
+# configuring warnings
 warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
 warn_return_any = true
 warn_unreachable = true
+
 exclude = ["build", "docs"]
 
 [tool.coverage.run]
@@ -57,6 +56,7 @@ command_line = "-m pytest"
 branch = true
 
 [tool.coverage.report]
+omit = ["_types.py"]
 exclude_also = ["if TYPE_CHECKING:", 'if __name__ == "__main__":']
 fail_under = 100
 show_missing = true
@@ -86,8 +86,8 @@ show-fixes = true
 
 exclude = [".git", ".idea", ".mypy_cache", ".tox", ".venv", ".nox"]
 
-target-version = "py310"
-line-length = 88
+target-version = "py39"
+line-length = 100
 indent-width = 4
 
 [tool.ruff.format]
@@ -108,7 +108,7 @@ ignore = [
   # ALLOW PICKLE USE
   "S301", # `pickle` and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue
   # IGNORE TODO
-  "TD002",  # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
+  # "TD002",  # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
   "TD003",  # Missing issue link on the line following this TODO
   "FIX002", # Line contains TODO, consider resolving the issue
   "FBT001", # Boolean-typed positional argument in function definition

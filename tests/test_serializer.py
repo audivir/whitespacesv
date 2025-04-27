@@ -51,16 +51,7 @@ def test_serialize_line(
     hashed_comment = ("#" + comment) if comment is not None else ""
 
     if not line.whitespaces:
-        assert (
-            serialize_line(values, whitespaces, comment)
-            == without_whitespace + hashed_comment
-        )
+        assert serialize_line(values, whitespaces, comment) == without_whitespace + hashed_comment
     else:
-        assert (
-            serialize_line(values, whitespaces, comment)
-            == with_whitespace + hashed_comment
-        )
-        assert (
-            serialize_values_with_whitespace(values, line.whitespaces)
-            == with_whitespace
-        )
+        assert serialize_line(values, whitespaces, comment) == with_whitespace + hashed_comment
+        assert serialize_values_with_whitespace(values, line.whitespaces) == with_whitespace

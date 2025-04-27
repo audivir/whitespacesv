@@ -10,13 +10,10 @@ from whitespacesv.line import WsvLine
 @pytest.mark.parametrize(
     ("whitespaces", "expected"), [([" ", None], False), (None, False), (["te"], True)]
 )
-def test_validate_whitespaces(
-    whitespaces: list[str | None] | None, expected: bool
-) -> None:
+def test_validate_whitespaces(whitespaces: list[str | None] | None, expected: bool) -> None:
     if expected:
         with pytest.raises(
-            ValueError,
-            match="Whitespace value contains non whitespace character/line feed",
+            ValueError, match="Whitespace value contains non whitespace character/line feed"
         ):
             WsvLine.validate_whitespaces(whitespaces)
     else:

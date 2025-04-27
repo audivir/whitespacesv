@@ -40,7 +40,7 @@ class WsvLine:
             return False
 
         return (
-            self.values == value.values  # noqa: PD011
+            self.values == value.values
             and self.whitespaces == value.whitespaces
             and self.comment == value.comment
         )
@@ -64,9 +64,7 @@ class WsvLine:
                     continue
 
                 if not is_string_whitespace(whitespace):
-                    raise ValueError(
-                        "Whitespace value contains non whitespace character/line feed"
-                    )
+                    raise ValueError("Whitespace value contains non whitespace character/line feed")
 
     @staticmethod
     def validate_comment(comment: str | None) -> None:

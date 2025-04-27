@@ -38,11 +38,7 @@ def test_repr() -> None:
 
 @pytest.mark.parametrize(
     ("preserves", "expected"),
-    [
-        ("preserve", ["a \tb c #comment"]),
-        ("compact", ["a b c"]),
-        ("pretty", ["a\tb\tc\t#comment"]),
-    ],
+    [("preserve", ["a \tb c #comment"]), ("compact", ["a b c"]), ("pretty", ["a\tb\tc\t#comment"])],
 )
 def test_serialize(
     preserves: Literal["preserve", "compact", "pretty"], expected: list[str]
@@ -95,12 +91,7 @@ def test_from_pandas() -> None:
     test_df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
     doc = WsvDocument.from_pandas(test_df)
 
-    lines = [
-        WsvLine(["a", "b"]),
-        WsvLine(["1", "4"]),
-        WsvLine(["2", "5"]),
-        WsvLine(["3", "6"]),
-    ]
+    lines = [WsvLine(["a", "b"]), WsvLine(["1", "4"]), WsvLine(["2", "5"]), WsvLine(["3", "6"])]
     expected_doc = WsvDocument(lines)
 
     doc_wo_header = WsvDocument.from_pandas(test_df, header=False)

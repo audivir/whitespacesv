@@ -148,8 +148,7 @@ def test_get_exc() -> None:
 
 
 @pytest.mark.parametrize(
-    ("text", "expected"),
-    [("a", False), ("#", True), ("", True), (" ", True), ("\n", True)],
+    ("text", "expected"), [("a", False), ("#", True), ("", True), (" ", True), ("\n", True)]
 )
 def test_stop_read(text: str, expected: bool) -> None:
     it = WsvCharIterator(text)
