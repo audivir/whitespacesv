@@ -33,13 +33,13 @@ class SerializationMode(Enum):
 def prettify_values(values: list[list[str]], comments: list[str | None]) -> list[str]:
     """Prettifies the values and adds comments if present."""
     # Get the maximum length of each column
-    transposed_it: Iterator[tuple[str, ...]] = zip(*values, strict=False)
+    transposed_it: Iterator[tuple[str, ...]] = zip(*values)
     col_sizes = [max(len(x) for x in col) for col in transposed_it]
 
     min_spacing = "\t"
 
     serialized: list[str] = []
-    for serialized_values, comment in zip(values, comments, strict=False):
+    for serialized_values, comment in zip(values, comments):
         expanded_cols = [f"{x:<{col_sizes[ix]}}" for ix, x in enumerate(serialized_values)]
 
         serialized_line = min_spacing.join(expanded_cols)

@@ -1,2 +1,3 @@
 _.from_pandas  # unused method (src/whitespacesv/document.py:180)
 _.to_pandas  # unused method (src/whitespacesv/document.py:155)
+PathLike  # unused import (whitespacesv/txt.py:12)

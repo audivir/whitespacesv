@@ -3,13 +3,15 @@
 # ruff: noqa: PLR2004
 from __future__ import annotations
 
-from os import PathLike
 from pathlib import Path
-from typing import TypeAlias
+from typing import TYPE_CHECKING
 
-from typing_extensions import Self
+from typing_extensions import Self, TypeAlias
 
-StrPath: TypeAlias = str | PathLike[str] | Path
+if TYPE_CHECKING:
+    from os import PathLike
+
+StrPath: TypeAlias = "str | PathLike[str]"
 
 
 def chars_to_ords(chars: str) -> list[int]:

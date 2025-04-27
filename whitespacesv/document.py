@@ -93,7 +93,7 @@ class WsvDocument:
         elif mode == SM.PRESERVE:
             serialized = [
                 serialize_line(line_values, line.whitespaces, line.comment)
-                for line_values, line in zip(values, self.lines, strict=False)
+                for line_values, line in zip(values, self.lines)
             ]
         else:
             raise RuntimeError(f"Invalid mode: {mode}")  # pragma: no cover
