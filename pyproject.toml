@@ -1,61 +1,72 @@
 [build-system]
-requires = ["setuptools >= 77.0.3"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
 
 [project]
 name = "whitespacesv"
 dynamic = ["version"]
-dependencies = ["pandas"]
-requires-python = ">=3.9"
+description = "WSV (Whitespace Separated Values) parser and serializer"
 authors = [{ name = "Tim Hörmann", email = "pypi@audivir.de" }]
-description = "Fork from stenway/WSV-Python"
 readme = "README.md"
+requires-python = ">=3.10,<3.15"
 license = "MIT"
+keywords = []
 classifiers = [
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+  "Programming Language :: Rust",
 ]
-
-[project.urls]
+dependencies = ["polars"]
 
 [project.optional-dependencies]
-dev = ["ruff", "mypy", "pytest", "coverage[toml]", "vulture"]
 
-[tool.setuptools]
-dynamic = { version = { attr = "whitespacesv.__version__" } }
+[project.urls]
+Homepage = "https://github.com/audivir/whitespacesv"
+Repository = "https://github.com/audivir/whitespacesv"
+Issues = "https://github.com/audivir/whitespacesv/issues"
+
+[dependency-groups]
+dev = ["mypy", "pytest", "coverage", "prek", "ruff"]
+
+[tool.maturin]
+python-source = "python"
+module-name = "whitespacesv._whitespacesv"
 
 [tool.mypy]
-python_version = "3.9"
 strict = true
 disable_error_code = "import-untyped"
 enable_error_code = """type-arg,no-untyped-def,redundant-cast,redundant-self,comparison-overlap,
                     no-untyped-call,no-any-return,no-any-unimported,unreachable,deprecated,redundant-expr,
                     possibly-undefined,truthy-bool,truthy-iterable,ignore-without-code,
-                    unused-awaitable,unused-ignore,explicit-override,unimported-reveal,mutable-override,unimported-reveal,explicit-any"""
+                    unused-awaitable,unused-ignore,explicit-override,unimported-reveal,mutable-override,explicit-any"""
 
-# untyped definitions and calls
-disallow_untyped_calls = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-
-# configuring warnings
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_return_any = true
+# beyond strict
 warn_unreachable = true
+warn_unused_configs = true
+local_partial_types = true
 
 exclude = ["build", "docs"]
 
 [tool.coverage.run]
-source = ["whitespacesv", "tests"]
+source = ["tests", "whitespacesv"]
 command_line = "-m pytest"
 branch = true
+patch = ["subprocess"]
 
 [tool.coverage.report]
-omit = ["_types.py"]
-exclude_also = ["if TYPE_CHECKING:", 'if __name__ == "__main__":']
+omit = ["_types.py", "tests/benchmark.py"]
+exclude_also = [
+  "if TYPE_CHECKING:",
+  'if __name__ == "__main__"',
+  "from __future__ import annotations",
+  "@overload",
+  "\\.\\.\\.",
+]
 fail_under = 100
 show_missing = true
 
@@ -73,73 +84,47 @@ testpaths = ["tests"]
 
 [tool.vulture]
 ignore_names = ["_*", "unused_*"]
-paths = [".whitelist", "whitespacesv"]
+paths = [".whitelist", "tests", "python"]
 make_whitelist = true
 sort_by_size = true
 verbose = false
 
 [tool.ruff]
-fix = true
-show-fixes = true
-
-exclude = [".git", ".idea", ".mypy_cache", ".tox", ".venv", ".nox"]
-
-target-version = "py39"
 line-length = 100
-indent-width = 4
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = true
 
 [tool.ruff.lint]
 dummy-variable-rgx = "^(dummy_.*|unused_.*|_)$"
 
 select = ["ALL"]
 
-fixable = ["ALL"]
-
 ignore = [
-  "ISC001", # implicit-str-concat
-  "COM812", # missing-trailing-comma
-  # ALLOW PICKLE USE
-  "S301", # `pickle` and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue
-  # IGNORE TODO
-  # "TD002",  # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
-  "TD003",  # Missing issue link on the line following this TODO
-  "FIX002", # Line contains TODO, consider resolving the issue
-  "FBT001", # Boolean-typed positional argument in function definition
-  "FBT002", # Boolean default positional argument
-  "FBT003", # Boolean positional value in function call
-  # "T201",  # `print` found
-  "NPY002", # Replace legacy `np.random.permutation` call with `np.random.Generator.permutation`
-  "ANN401", # Dynamically typed expressions (typing.Any) are disallowed in `**kwargs`
-  # EXCEPTIONS
-  "EM101",  # Exception must not use a string literal, assign to variable first
-  "EM102",  # Exception must not use an f-string literal, assign to variable first
-  "TRY003", # Avoid specifying long messages outside the exception class
-  "TRY300", # Use of else blocks in try/except
-  # DOCSTRINGS
-  #"D102",  # Missing docstring in public method
-  #"D103",  # Missing docstring in public function
-  "D105", # Missing docstring in magic method
-  # "D107",  # Missing docstring in `__init__`
-  #"D415",  # First line should end with a period, question mark, or exclamation point
+  "CPY001",  # Missing copyright notice at top of file
+  "PLC0415", # `import` should be at the top-level of a file
+  "ISC001",  # implicit-str-concat
+  "COM812",  # missing-trailing-comma
+  "S301",    # `pickle` and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue
+  "TD003",   # Missing issue link on the line following this TODO
+  "FIX002",  # Line contains TODO, consider resolving the issue
+  "FBT001",  # Boolean-typed positional argument in function definition
+  "FBT002",  # Boolean default positional argument
+  "FBT003",  # Boolean positional value in function call
+  "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed in `**kwargs`
+  "EM101",   # Exception must not use a string literal, assign to variable first
+  "EM102",   # Exception must not use an f-string literal, assign to variable first
+  "TRY003",  # Avoid specifying long messages outside the exception class
+  "TRY300",  # Use of else blocks in try/except
+  "D105",    # Missing docstring in magic method
 ]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-[tool.ruff.lint.mccabe]
-max-complexity = 10
-
-[tool.ruff.lint.pylint]
-max-args = 10
-
 [tool.ruff.lint.isort]
 required-imports = ["from __future__ import annotations"]
 split-on-trailing-comma = false
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
 
 [tool.ruff.lint.per-file-ignores]
 # Stub files for C extensions are allowed to have docstrings and overwrite __doc__, __version__, etc.
@@ -147,7 +132,6 @@ split-on-trailing-comma = false
 
 # conf.py automatically created by Sphinx
 "docs/conf.py" = ["INP001", "D100", "ERA001", "A"]
-"noxfile.py" = ["INP001"]
 
 # Test files do not need to have docstrings at each test function
 # S101: assert, PLR2004: magic value comparison, T20: print statements

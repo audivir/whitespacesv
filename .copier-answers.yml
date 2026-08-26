@@ -1,0 +1,11 @@
+# Changes here will be overwritten by Copier
+_commit: e730ed7
+_src_path: gh:audivir/copier-template
+author_email: pypi@audivir.de
+author_name: Tim Hörmann
+description: WSV (Whitespace Separated Values) parser and serializer
+github_org: audivir
+project_name: whitespacesv
+project_slug: whitespacesv
+project_type: pyo3
+publishable: true

@@ -1,0 +1,24 @@
+[package]
+name = "whitespacesv"
+version = "0.2.0"
+edition = "2024"
+description = "WSV (Whitespace Separated Values) parser and serializer"
+
+[lib]
+name = "_whitespacesv"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { version = "0.29.2" }
+
+[dev-dependencies]
+pyo3 = { version = "0.29.2", features = ["auto-initialize"] }
+
+[features]
+default = ["extension-module"]
+extension-module = ["pyo3/extension-module"]
+
+[profile.release]
+codegen-units = 1
+debug = false
+lto = "fat"
