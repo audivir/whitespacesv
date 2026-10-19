@@ -1,5 +1,4 @@
 # rust-generated files
-Cargo.lock
 **/*.rs.bk
 /target/
 
